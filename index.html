@@ -19,7 +19,7 @@
 
         .cr {
             color: rgba(135, 135, 135, 0.55);
-            left: 180px;
+            left: 160px;
             top: 15px;
             font-size: 12px;
             position: absolute;
@@ -50,7 +50,7 @@
         .scene {
             height: initial;
             position: absolute;
-            top: 45px;
+            top: 80px;
             left: 1%;
             right: 1%;
         }
@@ -174,7 +174,8 @@
 
         .Bgmusic {
             position: absolute;
-            right: 30px;
+            left: 20px;
+            top: 44px;
         }
     </style>
 </head>
@@ -266,7 +267,7 @@
             $("Begin").textContent = "重新开始 已点击" + count_sum + "步";
             if (cacheObj == self) {
                 return;
-            } 
+            }
             self.className = "box hover";
             if (cacheObj == null)// 判断缓存存在
             {
