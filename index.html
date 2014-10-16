@@ -1,10 +1,11 @@
 ﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <!-- disable iPhone inital scale -->
-    <meta name="viewport" content="width=device-width; initial-scale=1.0" />
+    <!-- 禁用横向滚动 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=0" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>连连看</title>
+
     <style type="text/css">
         html {
             background: #F6F6F1 url("img/main_bg.jpg");
@@ -50,7 +51,7 @@
         .scene {
             height: initial;
             position: absolute;
-            top: 80px;
+            top: 95px;
             left: 1%;
             right: 1%;
         }
@@ -85,6 +86,10 @@
             position: absolute;
             top: 0;
             left: 0;
+            backface-visibility: hidden;
+            transition-duration: .3s;
+            transition-property: transform;
+            transform: rotate3d(0,1,0,0deg);
             -webkit-backface-visibility: hidden;
             -webkit-transition-duration: .3s;
             -webkit-transition-property: transform;
@@ -97,6 +102,10 @@
             position: absolute;
             top: 0;
             left: 0;
+            transform: rotate3d(0,1,0,-180deg);
+            backface-visibility: hidden;
+            transition-duration: .3s;
+            transition-property: transform;
             -webkit-transform: rotate3d(0,1,0,-180deg);
             -webkit-backface-visibility: hidden;
             -webkit-transition-duration: .3s;
@@ -104,22 +113,29 @@
         }
 
         .turning1 {
+            transform: rotate3d(0,1,0,0deg);
+            transition-duration: 2.0s;
+            transition-delay: 2.0s;
             -webkit-transform: rotate3d(0,1,0,0deg);
             -webkit-transition-duration: 2.0s;
             -webkit-transition-delay: 2.0s;
         }
 
         .turning2 {
+            transform: rotate3d(0,1,0,-270deg);
+            transition-duration: 2.0s;
             -webkit-transform: rotate3d(0,1,0,-270deg);
             -webkit-transition-duration: 2.0s;
         }
 
 
         .hover .img {
+            transform: rotate3d(0,1,0,0deg);
             -webkit-transform: rotate3d(0,1,0,0deg);
         }
 
         .hover .bg {
+            transform: rotate3d(0,1,0,-180deg);
             -webkit-transform: rotate3d(0,1,0,-180deg);
         }
 
@@ -201,109 +217,110 @@
         <source src="sound/ding.mp3" />
     </audio>
 
+    <script type="text/javascript">
 
-</body>
-<script type="text/javascript">
+        var $ = function (obj) { return document.getElementById(obj); }
 
-    var $ = function (obj) { return document.getElementById(obj); }
+        // 图片模型
+        var model = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    // 图片模型
-    var model = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        // 随机排列
+        function fn() { return Math.random() - Math.random(); }
 
-    // 随机排列
-    function fn() { return Math.random() - Math.random(); }
+        model.sort(fn);
 
-    model.sort(fn);
+        var html = "";
 
-    var html = "";
-
-    //插入html描述
-    for (var i = 0, len = model.length; i < len; i++) {
-        var url = "img/" + model[i] + ".jpg"; //图片地址
-        html += '<div class="box" attr=' + model[i] + ' id="box' + i + '"><span class="bg" id="bg' + i + '"></span><img class="img" id="img' + i + '" src=' + url + ' /></div>';
-    }
-
-
-
-    $("scene").innerHTML = html; // 插入显示数据
-
-    //调整图片比例
-    function onresize() {
-        var picbox = document.getElementById("box1");
-        var imgs, bgs;
-        var picbox_w = picbox.offsetWidth;
-        var picbox_h = picbox_w * 4 / 5;//在此修改图片比例!
-        for (var i = 0; i < 18; i++) {
-            picbox = document.getElementById("box" + i);
-            picbox.style.height = picbox_h + 'px';
-            imgs = document.getElementById("img" + i);
-            imgs.style.width = picbox_w + 'px';
-            imgs.style.height = picbox_h + 'px';
-            bgs = document.getElementById("bg" + i);
-            bgs.style.width = picbox_w + 'px';
-            bgs.style.height = picbox_h + 'px';
+        //插入html描述
+        for (var i = 0, len = model.length; i < len; i++) {
+            var url = "img/" + model[i] + ".jpg"; //图片地址
+            html += '<div class="box" attr=' + model[i] + ' id="box' + i + '"><span class="bg" id="bg' + i + '"></span><img class="img" id="img' + i + '" src=' + url + ' /></div>';
         }
-    }
-
-    onresize();
 
 
 
-    var cacheObj = null; //缓存数据
+        $("scene").innerHTML = html; // 插入显示数据
 
-    var aBtn = $("scene").getElementsByTagName("div");
-
-    var count = 0;//配对数
-
-    var count_sum = 0;//按键数
-
-    var ding = document.getElementById("dingmusic");//音效
-
-    for (var i = 0, len = aBtn.length; i < len; i++) {
-        aBtn[i].onclick = function () {
-            var self = this;
-            ding.play();
-            count_sum++;
-            $("Begin").textContent = "重新开始 已点击" + count_sum + "步";
-            if (cacheObj == self) {
-                return;
+        //调整图片比例
+        function onresize() {
+            var picbox = document.getElementById("box1");
+            var imgs, bgs;
+            var picbox_w = picbox.offsetWidth;
+            var picbox_h = picbox_w * 4 / 5;//在此修改图片比例!
+            for (var i = 0; i < 18; i++) {
+                picbox = document.getElementById("box" + i);
+                picbox.style.height = picbox_h + 'px';
+                imgs = document.getElementById("img" + i);
+                imgs.style.width = picbox_w + 'px';
+                imgs.style.height = picbox_h + 'px';
+                bgs = document.getElementById("bg" + i);
+                bgs.style.width = picbox_w + 'px';
+                bgs.style.height = picbox_h + 'px';
             }
-            self.className = "box hover";
-            if (cacheObj == null)// 判断缓存存在
-            {
-                cacheObj = self;
-            }
-            else {
-                if (cacheObj.getAttribute("attr") == self.getAttribute("attr"))// 判断数值 是否相等
+        }
+
+        onresize();
+
+
+
+        var cacheObj = null; //缓存数据
+
+        var aBtn = $("scene").getElementsByTagName("div");
+
+        var count = 0;//配对数
+
+        var count_sum = 0;//按键数
+
+        var ding = document.getElementById("dingmusic");//音效
+
+        for (var i = 0, len = aBtn.length; i < len; i++) {
+            aBtn[i].onclick = function () {
+                var self = this;
+                ding.play();
+                count_sum++;
+                $("Begin").textContent = "重新开始 已点击" + count_sum + "步";
+                if (cacheObj == self) {
+                    return;
+                }
+                self.className = "box hover";
+                if (cacheObj == null)// 判断缓存存在
                 {
-                    self.className = cacheObj.className = "box hover";
-                    self.onclick = cacheObj.onclick = null;
-                    cacheObj = null;
-                    count++;
+                    cacheObj = self;
                 }
                 else {
-                    setTimeout(function () {
-                        self.className = "box";
-                        if (cacheObj) {
-                            cacheObj.className = "box";
-                        }
+                    if (cacheObj.getAttribute("attr") == self.getAttribute("attr"))// 判断数值 是否相等
+                    {
+                        self.className = cacheObj.className = "box hover";
+                        self.onclick = cacheObj.onclick = null;
                         cacheObj = null;
-                    }, 300);
+                        count++;
+                    }
+                    else {
+                        setTimeout(function () {
+                            self.className = "box";
+                            if (cacheObj) {
+                                cacheObj.className = "box";
+                            }
+                            cacheObj = null;
+                        }, 300);
 
+                    }
+                }
+                if (count == 9) {
+                    setTimeout(function () {
+                        $("scene").className = "scene turning2";
+                        $("footer").className = "turning1";
+                    }, 300)
                 }
             }
-            if (count == 9) {
-                setTimeout(function () {
-                    $("scene").className = "scene turning2";
-                    $("footer").className = "turning1";
-                }, 300)
-            }
+
+        }
+        $("Begin").onclick = function () {
+            location.reload();
         }
 
-    }
-    $("Begin").onclick = function () {
-        location.reload();
-    }
+    </script>
 
-</script>
+</body>
+
 </html>
